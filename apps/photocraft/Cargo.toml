@@ -41,8 +41,6 @@ open = "5"
 # Reads the saved window layout (eframe persistence) to drop values that would abort startup.
 ron = "0.12"
 
-[target.'cfg(target_os = "linux")'.dependencies]
-eframe = { workspace = true, features = ["wayland", "x11"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Safe CoreGraphics bindings, compatible with the existing macOS 11 deployment target.
@@ -67,6 +65,7 @@ dispatch2 = { version = "=0.3.1", default-features = false, features = ["std"] }
 
 # Drop position on X11 (`cursor.rs`): pure-Rust X client, already in Cargo.lock; pinned exactly.
 [target.'cfg(target_os = "linux")'.dependencies]
+eframe = { workspace = true, features = ["wayland", "x11"] }
 photocraft-cms = { workspace = true }
 x11rb = { version = "=0.13.2", default-features = false, features = ["image", "randr", "xkb"] }
 # Clipboard images in types other than PNG on Wayland (`services.rs`, #2546): arboard asks for
