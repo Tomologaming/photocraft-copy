@@ -141,3 +141,59 @@ Detail and the next releases: [docs/roadmap.md](docs/roadmap.md).
 | 2026-10-10 | minor | Mainstream-practitioner and essentials-user numbers added |
 | 2026-10-10 | minor | Alpha gate result (passes; stays alpha) in the stage explanation |
 | 2026-10-10 | major | First version, per craftrules `standards/progress-docs.md` |
+
+
+---
+
+## iPadOS port (iPad A16, Sideloadly)
+
+**Status: planning** · Build environment: GitHub Actions macOS runners · Distribution target: sideloadable IPA
+
+This is a separate platform port, not a claim that the current desktop UI already works on iPad. The existing app is Rust/egui/eframe and the browser build is Rust compiled to WebAssembly. The repository's `AGENTS.md` prohibits webview shells and JavaScript/TypeScript UI; respect that rule and resolve any proposed architecture change explicitly before coding. Feature parity with the desktop app is a goal, not an assumption. PhotoCraft is currently alpha, so port-specific compatibility and limitations must be recorded honestly.
+
+### Phase 0 — feasibility and architecture
+
+- [ ] Audit `eframe`, `egui`, `wgpu`, `rfd`, codecs, fonts, and native dependencies for the `aarch64-apple-ios` target.
+- [ ] Decide and document the approved iPad UI architecture without silently violating the Rust-first/no-webview rules.
+- [ ] Define the minimum supported iPadOS version and test strategy for the iPad A16.
+- [ ] Document supported file import/export, app sandbox access, persistence, memory pressure, and GPU constraints.
+- [ ] Define IPA signing/provisioning requirements for Sideloadly; keep all signing secrets out of git.
+
+### Phase 1 — build pipeline and app launch
+
+- [ ] Add a dedicated GitHub Actions workflow using a macOS runner to build and validate the iPadOS target.
+- [ ] Add an app bundle/project and required iPadOS metadata, icons, launch experience, and permissions.
+- [ ] Produce a reproducible unsigned or appropriately signed IPA artifact compatible with the chosen Sideloadly workflow.
+- [ ] Upload the IPA and build logs as workflow artifacts; clearly label experimental builds.
+- [ ] Verify install, launch, relaunch, and uninstall/reinstall on a physical iPad A16.
+
+### Phase 2 — usable editing baseline
+
+- [ ] Make app navigation and tool targets comfortable for touch in portrait and landscape.
+- [ ] Implement document open/import using the iPad document picker and Files provider locations.
+- [ ] Implement Save, Save As, export, and recovery-safe handling of interrupted edits.
+- [ ] Verify canvas pan, pinch zoom, selection, undo/redo, and keyboard/trackpad support where available.
+- [ ] Verify the core workflow end to end: open an image, edit, save/export, close, and reopen.
+
+### Phase 3 — iPad interaction and visual polish
+
+- [ ] Add Apple Pencil input with pressure/tilt only where the current input pipeline can support it reliably.
+- [ ] Add appropriate haptic feedback for discrete UI actions, with a setting to disable it; do not vibrate continuously while painting.
+- [ ] Design adaptive toolbars, layer panels, popovers, and floating controls for iPad screen sizes.
+- [ ] Add Liquid Glass styling where supported by the selected iPadOS SDK, with readable fallbacks for older versions.
+- [ ] Respect Dynamic Type where practical, accessibility labels, Reduce Motion, and light/dark appearance.
+
+### Phase 4 — compatibility and release quality
+
+- [ ] Audit every desktop feature and classify it as working, adapted, unsupported, or unverified on iPadOS.
+- [ ] Test PSD and other supported formats, large canvases, memory pressure, backgrounding, and recovery on device.
+- [ ] Add automated checks for the iPad build and smoke-test launch; document manual device checks.
+- [ ] Publish clear install/refresh instructions for Sideloadly, including signing expiry and re-signing caveats.
+- [ ] Update the README platform claims only after the port has been built and verified; document known limitations and release status.
+
+### Definition of done
+
+- [ ] A clean GitHub Actions run produces a downloadable IPA artifact.
+- [ ] That artifact installs and launches on a physical iPad A16 through the documented Sideloadly workflow.
+- [ ] The documented core editing workflow passes on device and does not lose a saved document.
+- [ ] Completed/unsupported features and test evidence are documented; `CHANGELOG.md`, `ROADMAP.md`, and, when applicable, `README.md` are updated.
