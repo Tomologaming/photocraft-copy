@@ -1,0 +1,38 @@
+name: iPadOS target probe
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/**"
+      - ".github/workflows/ios-target-probe.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-target-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust-ui-target-check:
+    name: Check Rust UI for aarch64-apple-ios
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+      - uses: Swatinem/rust-cache@v2
+      - name: Record Apple toolchain
+        run: |
+          xcodebuild -version
+          rustc --version
+          cargo --version
+      - name: Check shared UI and engine dependency graph for iOS
+        run: cargo check --locked --target aarch64-apple-ios -p photocraft-ui-egui
