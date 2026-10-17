@@ -4,6 +4,8 @@ Notable changes to the PhotoCraft iPadOS port and its build/install workflow are
 
 ## Unreleased
 
+- Added a macOS workflow that checks the complete `photocraft` app dependency graph for `aarch64-apple-ios`; this is a diagnostic target check, not an IPA build.
+- Documented the concrete iPadOS packaging blockers and acceptance criteria, including a real iOS app entry point, Xcode bundle configuration, signing, and physical-device verification.
 - Added a macOS GitHub Actions workflow to compile-check PhotoCraft's shared Rust UI dependency graph for `aarch64-apple-ios`.
 - Fixed a compile error found by the first checks: preset loading now initializes the persisted `export_presets` field. The checks need to rerun to verify the fix; no IPA is produced by this probe.
 
