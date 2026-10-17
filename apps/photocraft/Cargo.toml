@@ -29,17 +29,20 @@ photocraft-automation = { workspace = true }
 photocraft-ui-egui = { workspace = true }
 # Pen tablet pressure/tilt on macOS and X11 (the workspace's one isolated unsafe helper crate).
 photocraft-tablet = { workspace = true }
-eframe = { workspace = true, features = ["wgpu", "accesskit", "wayland", "x11", "persistence"] }
+eframe = { workspace = true, features = ["wgpu", "accesskit", "persistence"] }
 egui = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+[target.'cfg(not(any(target_arch = "wasm32", target_os = "ios")))' .dependencies]
 rfd = { workspace = true }
 arboard = { version = "3.6", features = ["wayland-data-control"] }
 open = "5"
 # Reads the saved window layout (eframe persistence) to drop values that would abort startup.
 ron = "0.12"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+eframe = { workspace = true, features = ["wayland", "x11"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Safe CoreGraphics bindings, compatible with the existing macOS 11 deployment target.
