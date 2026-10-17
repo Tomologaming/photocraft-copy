@@ -157,3 +157,15 @@ If the field has a PSD equivalent, map it in `crates/io` too, and keep unknown P
   GitHub profiles). Never hand-edit `contributors.json`.
 - Maintainers refresh the stats with `python3 ../../craftrules/scripts/contributors.py .` (it also
   re-verifies who wrote each `people.toml` entry; `--check` only verifies).
+
+
+## iPadOS port (Sideloadly) — contribution workflow
+
+The iPadOS effort is tracked in the **iPadOS port** section of `ROADMAP.md`. Read that section before working on the port and pick one unchecked task at a time.
+
+- Preserve the existing Rust-first architecture and shared document/command engine. Do not silently introduce a webview, JavaScript/TypeScript UI, Tauri, or Electron: the repository explicitly prohibits these. If a native SwiftUI shell or a platform-specific UI is proposed, first document the architectural trade-off and get maintainer approval before implementing it.
+- Target real iPadOS hardware (initial device: iPad with A16) and a Sideloadly-installable IPA. GitHub Actions macOS runners are the intended build environment; do not require the user to own a Mac.
+- Do not mark work complete because code was merely added. Run the available formatting, tests, and build checks; document any check that could not be run and why. For device-dependent work, state clearly whether it was actually tested on an iPad.
+- Keep tasks small and verifiable. Update the relevant checkboxes in `ROADMAP.md` only when their acceptance criteria are met.
+- **After every completed task**, update `CHANGELOG.md` with a dated, user-readable entry describing the actual change. Also update `ROADMAP.md` to reflect completed work and next steps, and update `README.md` when user-facing setup, supported platforms, build/install instructions, or feature claims have materially changed. Never claim an IPA is available or a feature works unless a corresponding build/test supports that claim.
+- Include test/build evidence in the change or pull request description. Keep secrets, signing certificates, provisioning profiles, and credentials out of the repository and logs; use GitHub Actions secrets only when required and explicitly configured by a maintainer.
