@@ -147,12 +147,13 @@ Detail and the next releases: [docs/roadmap.md](docs/roadmap.md).
 
 ## iPadOS port (iPad A16, Sideloadly)
 
-**Status: planning** · Build environment: GitHub Actions macOS runners · Distribution target: sideloadable IPA
+**Status: feasibility probe added; iOS target not yet verified** · Build environment: GitHub Actions macOS runners · Distribution target: sideloadable IPA
 
 This is a separate platform port, not a claim that the current desktop UI already works on iPad. The existing app is Rust/egui/eframe and the browser build is Rust compiled to WebAssembly. The repository's `AGENTS.md` prohibits webview shells and JavaScript/TypeScript UI; respect that rule and resolve any proposed architecture change explicitly before coding. Feature parity with the desktop app is a goal, not an assumption. PhotoCraft is currently alpha, so port-specific compatibility and limitations must be recorded honestly.
 
 ### Phase 0 — feasibility and architecture
 
+- [ ] Run the new `iPadOS target probe` workflow and record the actual `aarch64-apple-ios` compile result for `photocraft-ui-egui`.
 - [ ] Audit `eframe`, `egui`, `wgpu`, `rfd`, codecs, fonts, and native dependencies for the `aarch64-apple-ios` target.
 - [ ] Decide and document the approved iPad UI architecture without silently violating the Rust-first/no-webview rules.
 - [ ] Define the minimum supported iPadOS version and test strategy for the iPad A16.
@@ -197,3 +198,9 @@ This is a separate platform port, not a claim that the current desktop UI alread
 - [ ] That artifact installs and launches on a physical iPad A16 through the documented Sideloadly workflow.
 - [ ] The documented core editing workflow passes on device and does not lose a saved document.
 - [ ] Completed/unsupported features and test evidence are documented; `CHANGELOG.md`, `ROADMAP.md`, and, when applicable, `README.md` are updated.
+
+### iPadOS implementation log
+
+| Date | Change | Evidence / remaining work |
+|---|---|---|
+| 2026-10-17 | Added `.github/workflows/ios-target-probe.yml` to compile-check the shared Rust UI dependency graph on a macOS runner for `aarch64-apple-ios`. | Workflow is not yet run in this change; this is a feasibility probe, not an IPA or app-shell build. Desktop-only dependencies and the app entry point still need a target-specific audit. |
