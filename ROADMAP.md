@@ -203,4 +203,4 @@ This is a separate platform port, not a claim that the current desktop UI alread
 
 | Date | Change | Evidence / remaining work |
 |---|---|---|
-| 2026-10-17 | Added `.github/workflows/ios-target-probe.yml` to compile-check the shared Rust UI dependency graph on a macOS runner for `aarch64-apple-ios`. | Workflow is not yet run in this change; this is a feasibility probe, not an IPA or app-shell build. Desktop-only dependencies and the app entry point still need a target-specific audit. |
+| 2026-10-17 | Added `.github/workflows/ios-target-probe.yml` to compile-check the shared Rust UI dependency graph on a macOS runner for `aarch64-apple-ios`. The first runs exposed a Rust compile error in `PresetState::load_presets_json`: the `Persisted` initializer omitted `export_presets`. | Fixed by loading the `export_presets` key in the initializer. The workflow must rerun to reveal any further target-specific issues; this is not yet an IPA or app-shell build. Desktop-only dependencies and the app entry point still need a target-specific audit. |
