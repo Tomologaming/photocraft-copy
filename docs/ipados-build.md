@@ -4,7 +4,7 @@
 
 The iOS target probe in PR #2 checks only `photocraft-ui-egui`. It is not an iPad app build and does not produce an IPA.
 
-This stage expands the probe to the complete `photocraft` application dependency graph. Its purpose is to expose platform-specific blockers in the app shell and dependencies before adding packaging infrastructure.
+The `photocraft` target now selects a dedicated iPadOS entry point and omits desktop-only shell dependencies (native desktop file dialogs, clipboard integration, and desktop automation). The iPadOS target check validates this entry point and the shared PhotoCraft UI/core dependency graph. Desktop behavior remains in the existing entry point, unchanged.
 
 ## Why a successful Rust target check is not an IPA
 
@@ -15,7 +15,7 @@ An iPad-installable package requires more than compiling Rust for `aarch64-apple
 3. A signed app bundle. Sideloadly can sign/install a compatible IPA, but the archive still needs to be a valid iOS app.
 4. Device testing on physical hardware, including touch, file import/export, lifecycle and GPU rendering.
 
-The current app manifest includes desktop-oriented facilities such as native file dialogs, clipboard access, desktop automation/control services, and platform-specific shell modules. The target audit will identify compile-time issues; it does not claim those desktop interactions are already suitable for iPadOS.
+The iPadOS entry point currently starts the shared PhotoCraft UI with default services. Native iPad document import/export, share-sheet integration, persistent app-container paths, and lifecycle/device validation still need dedicated implementation; this target check does not claim those features are complete.
 
 ## Packaging and signing policy
 

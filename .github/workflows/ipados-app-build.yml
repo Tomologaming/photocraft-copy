@@ -37,5 +37,5 @@ jobs:
           xcrun --sdk iphoneos --show-sdk-version
           rustc --version
           cargo --version
-      - name: Check the full desktop application for iOS target compatibility
+      - name: Check the iPadOS entry point and shared app dependency graph
         run: cargo check --locked --target aarch64-apple-ios -p photocraft

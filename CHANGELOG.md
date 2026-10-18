@@ -4,7 +4,7 @@ Notable changes to the PhotoCraft iPadOS port and its build/install workflow are
 
 ## Unreleased
 
-- Kept Linux-only Wayland/X11 eframe backends out of the iOS dependency graph and excluded desktop file-dialog/clipboard/open-with dependencies from iOS targets, addressing the first full-app target-check blocker.
+- Added a dedicated iPadOS entry point and kept desktop-only file-dialog, clipboard, and automation dependencies out of the iOS target.
 - Added a macOS workflow that checks the complete `photocraft` app dependency graph for `aarch64-apple-ios`; this is a diagnostic target check, not an IPA build.
 - Documented the concrete iPadOS packaging blockers and acceptance criteria, including a real iOS app entry point, Xcode bundle configuration, signing, and physical-device verification.
 - Added a macOS GitHub Actions workflow to compile-check PhotoCraft's shared Rust UI dependency graph for `aarch64-apple-ios`.
