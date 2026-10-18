@@ -1,35 +1,3 @@
-//! PhotoCraft desktop app.
-//!
-//! Usage: `photocraft [--control <port>] [--control-token <64-hex> |
-//! --control-token-file <path>] [--automation-read-root <dir>]
-//! [--automation-write-root <dir>] [--safe-gpu] [--in-window-menus] [--present-mode <mode>]
-//! [--frame-latency <n>] [--stroke-trace <stderr|file.csv>] [--new-instance] [files…]`
-//!
-//! On Windows and Linux a launch hands its files to the PhotoCraft that is already running (new
-//! tabs in its window) and exits; `--new-instance` starts a separate copy instead, as does any
-//! `--control` launch (see `single_instance`).
-//!
-//! `--present-mode` (`fifo`, `autovsync`, `novsync`) and `--frame-latency` (1–3) override how
-//! frames reach the display for this launch (`PHOTOCRAFT_PRESENT_MODE` / `…_FRAME_LATENCY`;
-//! `presentation`); `--stroke-trace` times each brush stroke's frames (`PHOTOCRAFT_STROKE_TRACE`;
-//! `photocraft_ui_egui::stroke_trace`).
-//!
-//! `--safe-gpu` starts with the CPU renderer (no GPU canvas; a software adapter for the window
-//! where the platform has one) for this launch, e.g. after a graphics driver crash. A start that
-//! crashes inside the driver also falls back by itself next time (see `gpu_startup`).
-//!
-//! `--in-window-menus` (or `PHOTOCRAFT_IN_WINDOW_MENUS=1`) keeps the menus inside the window on
-//! macOS instead of the macOS menu bar (`mac_menu`).
-//!
-//! `--control <port>` (or `PHOTOCRAFT_CONTROL_PORT`) starts a localhost JSON-lines control server.
-//! The first line must authenticate; subsequent request lines get reply lines.
-//! `{"id":1,"ok":true,"result":…}`. See `photocraft_ui_egui::control` for the methods.
-
-// Release builds on Windows are GUI-subsystem apps, so launching from the Start Menu or Explorer
-// doesn't open a console window. (`--version` output then only shows when redirected.)
-#![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
-#![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
-
 mod app_dirs;
 mod app_icon;
 mod appearance;
