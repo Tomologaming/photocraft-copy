@@ -1,4 +1,4 @@
-//! iPadOS entry point. Desktop shell integrations are intentionally not compiled on iOS.
+// iPadOS entry point. Desktop shell integrations are intentionally not compiled on iOS.
 use photocraft_engine::Session;
 use photocraft_ui_egui::{PhotocraftApp, Services};
 
