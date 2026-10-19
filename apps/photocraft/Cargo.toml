@@ -25,21 +25,20 @@ photocraft-engine = { workspace = true }
 photocraft-codecs = { workspace = true }
 photocraft-io = { workspace = true }
 photocraft-format = { workspace = true }
-photocraft-automation = { workspace = true }
 photocraft-ui-egui = { workspace = true }
-# Pen tablet pressure/tilt on macOS and X11 (the workspace's one isolated unsafe helper crate).
-photocraft-tablet = { workspace = true }
-eframe = { workspace = true, features = ["wgpu", "accesskit", "wayland", "x11", "persistence"] }
+eframe = { workspace = true, features = ["wgpu", "accesskit", "persistence"] }
 egui = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+[target.'cfg(not(any(target_arch = "wasm32", target_os = "ios")))'.dependencies]
+photocraft-automation = { workspace = true }
+photocraft-tablet = { workspace = true }
 rfd = { workspace = true }
-arboard = { version = "3.6", features = ["wayland-data-control"] }
+arboard = { version = "3.6", default-features = false }
 open = "5"
-# Reads the saved window layout (eframe persistence) to drop values that would abort startup.
 ron = "0.12"
+
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Safe CoreGraphics bindings, compatible with the existing macOS 11 deployment target.
@@ -64,6 +63,8 @@ dispatch2 = { version = "=0.3.1", default-features = false, features = ["std"] }
 
 # Drop position on X11 (`cursor.rs`): pure-Rust X client, already in Cargo.lock; pinned exactly.
 [target.'cfg(target_os = "linux")'.dependencies]
+eframe = { workspace = true, features = ["wayland", "x11"] }
+arboard = { version = "3.6", features = ["wayland-data-control"] }
 photocraft-cms = { workspace = true }
 x11rb = { version = "=0.13.2", default-features = false, features = ["image", "randr", "xkb"] }
 # Clipboard images in types other than PNG on Wayland (`services.rs`, #2546): arboard asks for
