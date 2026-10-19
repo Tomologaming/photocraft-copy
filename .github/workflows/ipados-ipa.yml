@@ -11,7 +11,7 @@ on:
       - "crates/**"
       - "assets/app-icon/**"
       - ".github/workflows/ipados-ipa.yml"
-      - "packaging/ios/**"
+      - "ios/**"
       - "docs/ipados-build.md"
 
 permissions:
@@ -28,7 +28,6 @@ jobs:
     timeout-minutes: 90
     env:
       CARGO_TERM_COLOR: always
-      SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
       IPHONEOS_DEPLOYMENT_TARGET: "15.0"
     steps:
       - name: Check out source
@@ -44,46 +43,42 @@ jobs:
         with:
           key: ipados-ipa
 
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
       - name: Record toolchain and SDK
         run: |
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
           rustc --version
           cargo --version
+          echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
 
-      - name: Build native iPadOS executable
-        run: cargo build --locked --release --target aarch64-apple-ios -p photocraft
+      - name: Generate Xcode project
+        run: xcodegen generate --spec ios/project.yml
 
-      - name: Assemble IPA bundle
+      - name: Build native iPadOS app
+        run: |
+          xcodebuild \
+            -project ios/PhotoCraft.xcodeproj \
+            -scheme PhotoCraft \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package IPA
         shell: bash
         run: |
           set -euo pipefail
-          APP_VERSION="$(cargo metadata --no-deps --format-version 1 | python3 -c 'import json,sys; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "photocraft"))')"
-          APP_ROOT="$RUNNER_TEMP/ipa-root"
-          APP_DIR="$APP_ROOT/Payload/PhotoCraft.app"
-          mkdir -p "$APP_DIR"
-          install -m 755 target/aarch64-apple-ios/release/photocraft "$APP_DIR/PhotoCraft"
-          /usr/libexec/PlistBuddy -c "Add :CFBundleExecutable string PhotoCraft" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string org.photocraft.editor" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :CFBundleName string PhotoCraft" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string PhotoCraft" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :CFBundlePackageType string APPL" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $APP_VERSION" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $GITHUB_RUN_NUMBER" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :MinimumOSVersion string 15.0" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :LSRequiresIPhoneOS bool true" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 2" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities array" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities:0 string arm64" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationLandscapeLeft" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:1 string UIInterfaceOrientationLandscapeRight" "$APP_DIR/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:2 string UIInterfaceOrientationPortrait" "$APP_DIR/Info.plist"
-          plutil -lint "$APP_DIR/Info.plist"
-          test -x "$APP_DIR/PhotoCraft"
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/PhotoCraft.app"
+          test -d "$APP"
+          test -x "$APP/PhotoCraft"
+          plutil -lint "$APP/Info.plist"
           mkdir -p "$GITHUB_WORKSPACE/dist"
-          (cd "$APP_ROOT" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa" Payload)
+          (cd "$(dirname "$APP")" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa" PhotoCraft.app)
           unzip -l "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa"
 
       - name: Upload IPA artifact
