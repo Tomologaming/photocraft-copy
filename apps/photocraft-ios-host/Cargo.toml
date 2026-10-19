@@ -1,0 +1,15 @@
+[package]
+name = "photocraft-ios-host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Native iPadOS host entry point for PhotoCraft"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+eframe = { workspace = true, features = ["wgpu", "accesskit", "persistence"] }
+log = { workspace = true }
+photocraft-engine = { workspace = true }
+photocraft-ui-egui = { workspace = true }
