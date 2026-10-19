@@ -2010,6 +2010,25 @@ impl eframe::App for PhotocraftApp {
         // The OS title bar (and the taskbar / Alt-Tab entry) follows the active file; with the
         // system title bar this is where the document name lives, as the in-app title is hidden.
         panels::sync_window_title(self, &ctx);
+        // iPadOS reserves room for the system status area. This centered translucent capsule
+        // is a lightweight Liquid Glass-inspired app marker; desktop chrome starts below it.
+        #[cfg(target_os = "ios")]
+        egui::Panel::top("ipad_safe_area_glass")
+            .exact_size(46.0)
+            .frame(egui::Frame::NONE.fill(egui::Color32::from_rgba_unmultiplied(22, 24, 30, 150)))
+            .show(ui, |ui| {
+                let capsule = egui::Frame::new()
+                    .fill(egui::Color32::from_rgba_unmultiplied(245, 247, 252, 42))
+                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgba_unmultiplied(255, 255, 255, 80)))
+                    .corner_radius(egui::CornerRadius::same(18))
+                    .inner_margin(egui::Margin::symmetric(16, 5));
+                ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                    ui.add_space(1.0);
+                    capsule.show(ui, |ui| {
+                        ui.label(egui::RichText::new("PhotoCraft").size(13.0).strong().color(egui::Color32::WHITE));
+                    });
+                });
+            });
         let chrome = !self.ui.view.hides_chrome();
         if chrome && self.ui.panels.menu_bar {
             panels::title_bar(self, ui);
