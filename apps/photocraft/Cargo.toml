@@ -7,6 +7,10 @@ default-run = "photocraft"
 description = "PhotoCraft: an open-source, native image editor"
 build = "build.rs"
 
+[lib]
+# Xcode links this static library into the native iPadOS app host.
+crate-type = ["staticlib"]
+
 [features]
 # Open HEIC/HEIF photos (the optional photocraft-heif crate). Not default so distributors choose
 # it; official builds (CI, packaging/, release) build with `--features heif`.
