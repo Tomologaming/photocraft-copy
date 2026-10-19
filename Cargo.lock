@@ -4612,6 +4612,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "photocraft-ios-host"
+version = "0.9.0"
+dependencies = [
+ "eframe",
+ "log",
+ "photocraft-engine",
+ "photocraft-ui-egui",
+]
+
+[[package]]
 name = "photocraft"
 version = "0.9.0"
 dependencies = [
