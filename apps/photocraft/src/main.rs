@@ -7,3 +7,8 @@ include!("desktop_main.rs");
 
 #[cfg(target_os = "ios")]
 include!("ios_main.rs");
+
+#[cfg(target_os = "ios")]
+fn main() {
+    start_photocraft_app();
+}
