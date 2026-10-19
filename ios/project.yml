@@ -25,7 +25,7 @@ settings:
       - "$(SRCROOT)/../target/aarch64-apple-ios/release"
     OTHER_LDFLAGS:
       - "$(inherited)"
-      - "-lphotocraft"
+      - "-lphotocraft_ios_host"
       - "-framework"
       - "UIKit"
       - "-framework"
@@ -57,5 +57,5 @@ targets:
         script: |
           set -eu
           cd "$SRCROOT/.."
-          cargo build --locked --release --target aarch64-apple-ios --lib -p photocraft
+          cargo build --locked --release --target aarch64-apple-ios --lib -p photocraft-ios-host
         basedOnDependencyAnalysis: false
