@@ -1,13 +1,8 @@
 name: iPadOS target probe
 
+# Kept available for manual diagnosis; the IPA workflow is the normal iPadOS build path.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "crates/**"
-      - ".github/workflows/ios-target-probe.yml"
 
 permissions:
   contents: read
