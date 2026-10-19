@@ -53,7 +53,6 @@ jobs:
           rustc --version
           cargo --version
           echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
-          echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
 
       - name: Generate Xcode project
         run: cd ios && xcodegen generate --spec project.yml
@@ -78,8 +77,9 @@ jobs:
           test -d "$APP"
           test -x "$APP/PhotoCraft"
           plutil -lint "$APP/Info.plist"
-          mkdir -p "$GITHUB_WORKSPACE/dist"
-          (cd "$(dirname "$APP")" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa" PhotoCraft.app)
+          mkdir -p "$RUNNER_TEMP/ipa-root/Payload" "$GITHUB_WORKSPACE/dist"
+          ditto "$APP" "$RUNNER_TEMP/ipa-root/Payload/PhotoCraft.app"
+          (cd "$RUNNER_TEMP/ipa-root" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa" Payload)
           unzip -l "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa"
 
       - name: Upload IPA artifact
