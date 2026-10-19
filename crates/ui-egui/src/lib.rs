@@ -2014,7 +2014,7 @@ impl eframe::App for PhotocraftApp {
         // This is deliberately platform-gated; desktop sizing and chrome remain unchanged.
         #[cfg(target_os = "ios")]
         {
-            ctx.style_mut(|style| {
+            ctx.style_mut_of(egui::Theme::Dark, |style| {
                 style.spacing.button_padding = egui::vec2(10.0, 7.0);
                 style.spacing.interact_size = egui::vec2(40.0, 40.0);
                 style.spacing.item_spacing = egui::vec2(6.0, 6.0);
