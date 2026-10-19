@@ -1,0 +1,61 @@
+name: PhotoCraft
+options:
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: org.photocraft.editor
+    PRODUCT_NAME: PhotoCraft
+    TARGETED_DEVICE_FAMILY: "2"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    SDKROOT: iphoneos
+    SUPPORTED_PLATFORMS: iphoneos
+    ARCHS: arm64
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_CFBundleDisplayName: PhotoCraft
+    INFOPLIST_KEY_LSRequiresIPhoneOS: YES
+    INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    INFOPLIST_KEY_UIUserInterfaceStyle: Automatic
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGN_IDENTITY: ""
+    LIBRARY_SEARCH_PATHS:
+      - "$(inherited)"
+      - "$(SRCROOT)/../target/aarch64-apple-ios/release"
+    OTHER_LDFLAGS:
+      - "$(inherited)"
+      - "-lphotocraft_ios_host"
+      - "-framework"
+      - "UIKit"
+      - "-framework"
+      - "Foundation"
+      - "-framework"
+      - "Metal"
+      - "-framework"
+      - "MetalKit"
+      - "-framework"
+      - "QuartzCore"
+      - "-framework"
+      - "CoreGraphics"
+      - "-framework"
+      - "CoreVideo"
+      - "-framework"
+      - "GameController"
+      - "-framework"
+      - "Security"
+      - "-framework"
+      - "CoreFoundation"
+targets:
+  PhotoCraft:
+    type: application
+    platform: iOS
+    sources:
+      - path: PhotoCraft
+    preBuildScripts:
+      - name: Build Rust static library
+        script: |
+          set -eu
+          cd "$SRCROOT/.."
+          cargo build --locked --release --target aarch64-apple-ios --lib -p photocraft-ios-host
+        basedOnDependencyAnalysis: false

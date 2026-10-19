@@ -1,30 +1,27 @@
-# iPadOS build status and next steps
+# iPadOS build
 
-## Current status
+## Build workflow
 
-The iOS target probe in PR #2 checks only `photocraft-ui-egui`. It is not an iPad app build and does not produce an IPA.
+The `iPadOS IPA` workflow runs on a macOS 15 runner. It builds the Rust app as a static library
+for `aarch64-apple-ios`, generates an Xcode project, links the library into a native iOS app host,
+and packages the resulting `.app` directory into an IPA.
 
-The `photocraft` target now selects a dedicated iPadOS entry point and omits desktop-only shell dependencies (native desktop file dialogs, clipboard integration, and desktop automation). The iPadOS target check validates this entry point and the shared PhotoCraft UI/core dependency graph. Desktop behavior remains in the existing entry point, unchanged.
+Run it from **Actions → iPadOS IPA → Run workflow**. Changes to the app, shared crates, Cargo
+manifests, the iOS host/project, or this workflow also trigger a build on `main`. The output is
+uploaded as the `PhotoCraft-iPadOS-unsigned-IPA` artifact for 14 days.
 
-## Why a successful Rust target check is not an IPA
+## Signing and current limitations
 
-An iPad-installable package requires more than compiling Rust for `aarch64-apple-ios`:
+The artifact is **unsigned** because this repository has not been configured with an Apple signing
+certificate and provisioning profile. It is intended for validating the native build and bundle
+structure, not direct installation on a physical iPad or distribution through TestFlight/App Store.
+Signing should be added only after the matching Apple certificate and provisioning profile are
+configured as GitHub Actions secrets; never commit those credentials.
 
-1. A supported iOS application entry point and lifecycle integration for the chosen eframe/winit version.
-2. An Xcode app target/bundle with an iOS `Info.plist`, launch configuration, icons, and required capabilities.
-3. A signed app bundle. Sideloadly can sign/install a compatible IPA, but the archive still needs to be a valid iOS app.
-4. Device testing on physical hardware, including touch, file import/export, lifecycle and GPU rendering.
+The iPadOS entry point starts the shared PhotoCraft UI with default services. Native document
+import/export, share-sheet integration, persistent app-container paths, app icons, and device testing
+for touch, lifecycle, and GPU rendering remain follow-up work. A successful CI package is not a
+claim that these on-device behaviors have been validated.
 
-The iPadOS entry point currently starts the shared PhotoCraft UI with default services. Native iPad document import/export, share-sheet integration, persistent app-container paths, and lifecycle/device validation still need dedicated implementation; this target check does not claim those features are complete.
-
-## Packaging and signing policy
-
-Do not publish a placeholder or renamed Rust binary as an IPA. Do not commit signing certificates, provisioning profiles, or Apple account secrets. Once the iOS entry point and Xcode target are implemented, CI can build an unsigned device archive or a signed IPA using explicitly configured secrets. Local Sideloadly signing remains an option if the generated app bundle is valid.
-
-## Acceptance criteria
-
-- [ ] Full `photocraft` target check succeeds for `aarch64-apple-ios`.
-- [ ] A real iOS app entry point and Xcode project/build configuration exist.
-- [ ] CI produces a structurally valid IPA, not just a Rust executable or static library.
-- [ ] IPA installs and launches on a physical iPad.
-- [ ] Image import, editing, save/export, suspend/resume and GPU rendering are verified on device.
+The general desktop CI, documentation, packaging-lint, and standalone iOS target-probe workflows
+are manual-only; they do not run automatically on pushes or pull requests.

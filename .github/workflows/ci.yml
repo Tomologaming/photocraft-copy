@@ -1,10 +1,7 @@
 name: CI
 
+# General desktop CI is manual-only while development focuses on iPadOS.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
       fuzz:
@@ -14,7 +11,6 @@ on:
       fuzz_seconds:
         description: "Seconds per fuzz target"
         default: "600"
-
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1

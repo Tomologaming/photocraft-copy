@@ -1,0 +1,91 @@
+name: iPadOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "apps/photocraft/**"
+      - "crates/**"
+      - "assets/app-icon/**"
+      - ".github/workflows/ipados-ipa.yml"
+      - "ios/**"
+      - "docs/ipados-build.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ipados-ipa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ipa:
+    name: Build unsigned iPadOS IPA
+    runs-on: macos-15
+    timeout-minutes: 90
+    env:
+      CARGO_TERM_COLOR: always
+      IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Rust iOS target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Restore Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ipados-ipa
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Record toolchain and SDK
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          rustc --version
+          cargo --version
+          echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
+
+      - name: Generate Xcode project
+        run: cd ios && xcodegen generate --spec project.yml
+
+      - name: Build native iPadOS app
+        run: |
+          xcodebuild \
+            -project ios/PhotoCraft.xcodeproj \
+            -scheme PhotoCraft \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/PhotoCraft.app"
+          test -d "$APP"
+          test -x "$APP/PhotoCraft"
+          plutil -lint "$APP/Info.plist"
+          mkdir -p "$RUNNER_TEMP/ipa-root/Payload" "$GITHUB_WORKSPACE/dist"
+          ditto "$APP" "$RUNNER_TEMP/ipa-root/Payload/PhotoCraft.app"
+          (cd "$RUNNER_TEMP/ipa-root" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa" Payload)
+          unzip -l "$GITHUB_WORKSPACE/dist/PhotoCraft-iPadOS-unsigned.ipa"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhotoCraft-iPadOS-unsigned-IPA
+          path: dist/PhotoCraft-iPadOS-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
