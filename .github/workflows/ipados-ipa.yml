@@ -53,6 +53,7 @@ jobs:
           rustc --version
           cargo --version
           echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
+          echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
 
       - name: Generate Xcode project
         run: xcodegen generate --spec ios/project.yml
