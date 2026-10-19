@@ -56,7 +56,7 @@ jobs:
           echo "SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)" >> "$GITHUB_ENV"
 
       - name: Generate Xcode project
-        run: xcodegen generate --spec ios/project.yml
+        run: cd ios && xcodegen generate --spec project.yml
 
       - name: Build native iPadOS app
         run: |
